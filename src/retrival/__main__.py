@@ -1,20 +1,17 @@
+from chromadb import PersistentClient
 from toml import load
 import pandas as pd
-from retrival.database import populate_database
-from retrival.encoder import make_embedding_function
-from retrival.retriver import query_vector_db
+import numpy as np
 from sqlalchemy import create_engine
 from transformers import logging
+import json
 
 from retrival.config import Config
+from retrival.database import populate_database
+from retrival.encoder import make_embedding_function
 
 
-def main():
-    logging.set_verbosity_error()  # FIXME delete me; only used to silence huggingface warnings
-    config_data = load("config.toml")
-    config = Config(**config_data)
-
-    # create fake sqlite database
+def make_fake_database(config: Config):
     data = {
         "mrn": [1, 2, 3, 4, 5],
         "asd": [1, 1, 0, 0, 1],
@@ -30,20 +27,52 @@ def main():
     df = pd.DataFrame(data)
     engine = create_engine(config.relational_database.filepath)
     with engine.connect() as conn:
-        # FIXME change if_exists="append"
         df.to_sql(name="clinical_notes", con=conn, if_exists="replace")
 
+
+def main():
+    # TODO delete me; only used to silence huggingface warnings
+    logging.set_verbosity_error()
+    config_data = load("config.toml")
+    config = Config(**config_data)
+    # TODO delete for production
+    make_fake_database(config=config)
     query_texts = [
         "A fast black cat leaped over the sleepy wolf",
-        "An apple turnover a week keeps the physician away",
+        "An apple pie a week keeps the physician away",
     ]
     print(query_texts)
     embedding_function = make_embedding_function(config=config)
-    if config.populate_database:
-        populate_database(embedding_function=embedding_function, config=config)
-    query_vector_db(
-        query_texts=query_texts, embedding_function=embedding_function, config=config
+    client = PersistentClient(path=config.vector_database.path)
+    collection = client.get_or_create_collection(
+        name=config.vector_database.collection_name,
+        embedding_function=embedding_function,
+        metadata={"hnsw:space": "cosine"},
     )
+    if config.populate_database:
+        populate_database(collection=collection, config=config)
+    query_results = collection.query(
+        query_texts=query_texts,
+        n_results=config.vector_database.k_neighbors,
+        where=None,  # you can filter based on metadata e.g., {"asd": 1}
+        include=[
+            "documents",
+            "distances",
+            "metadatas",
+            "embeddings",
+        ],
+    )
+
+    print(query_results.keys())
+    print("ids:", query_results["ids"])
+    print("nearest neighbors:", query_results["documents"])
+    print("neighbor distances:", query_results["distances"])
+    embeddings = np.array(query_results["embeddings"])
+    print(
+        "embeddings shape (n_queries, k_neighbors, embedding dimension):",
+        embeddings.shape,
+    )
+    print("metadata:", json.dumps(query_results["metadatas"], indent=4))
 
 
 if __name__ == "__main__":

@@ -1,25 +1,16 @@
 from retrival.config import Config
 from sqlalchemy import create_engine, text
-from chromadb import Metadata, PersistentClient
-
-from retrival.encoder import make_embedding_function, Encoder
+from chromadb import Collection, Metadata
 
 
-def create_chunks(text: str, chunk_length: int, overlap: int):
+def create_chunks(text: str, chunk_length: int, overlap: int) -> list[str]:
     return [
         text[start : start + chunk_length]
         for start in range(0, len(text), chunk_length - overlap)
     ]
 
 
-def populate_database(embedding_function: Encoder, config: Config):
-    client = PersistentClient(path=config.vector_database.path)
-    embedding_function = make_embedding_function(config=config)
-    collection = client.get_or_create_collection(  # FIXME create_collection
-        name=config.vector_database.collection_name,
-        embedding_function=embedding_function,
-        metadata={"hnsw:space": "cosine"},
-    )
+def populate_database(collection: Collection, config: Config) -> None:
     engine = create_engine(config.relational_database.filepath)
     with engine.connect() as conn:
         query = text(f"SELECT * FROM {config.relational_database.table_name}")
@@ -30,7 +21,7 @@ def populate_database(embedding_function: Encoder, config: Config):
             if row is None:
                 break
             row = dict(row)
-            note_text = row["text"]  # .pop("text")  # FIXME "Note_text"
+            note_text = row["text"]  # FIXME "Note_text"
             chunks = create_chunks(
                 note_text,
                 chunk_length=config.vector_database.chunk_length,

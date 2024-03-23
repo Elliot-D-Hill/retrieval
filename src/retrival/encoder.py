@@ -26,6 +26,7 @@ class Encoder(EmbeddingFunction):
         return outputs.last_hidden_state.mean(dim=1).detach().tolist()
 
 
+# FIXME uncomment for production
 def make_embedding_function(config: Config):
     # tokenizer_path = config.encoder.huggingface / config.encoder.tokenizer
     # bcb_model_path = config.encoder.huggingface / config.encoder.bioclinicalbert
