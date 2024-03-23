@@ -30,7 +30,7 @@ def populate_database(embedding_function: Encoder, config: Config):
             if row is None:
                 break
             row = dict(row)
-            note_text = row.pop("text")  # FIXME "Note_text"
+            note_text = row["text"]  # .pop("text")  # FIXME "Note_text"
             chunks = create_chunks(
                 note_text,
                 chunk_length=config.vector_database.chunk_length,

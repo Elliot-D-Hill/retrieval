@@ -5,9 +5,10 @@ from chromadb import PersistentClient
 from retrival.config import Config
 
 
-def query_vector_db(query_texts, embedding_function, config: Config):
+def query_vector_db(
+    query_texts, embedding_function, config: Config, where: dict | None = None
+):
     client = PersistentClient(path=config.vector_database.path)
-
     collection = client.get_collection(
         name=config.vector_database.collection_name,
         embedding_function=embedding_function,
@@ -15,7 +16,7 @@ def query_vector_db(query_texts, embedding_function, config: Config):
     query_results = collection.query(
         query_texts=query_texts,
         n_results=config.vector_database.k_neighbors,
-        # where={"asd": 1},  # you can filter based on metadata
+        where=where,  # you can filter based on metadata e.g., {"asd": 1}
         include=[
             "documents",
             "distances",
