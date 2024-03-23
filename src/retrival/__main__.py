@@ -11,10 +11,12 @@ from retrival.database import populate_database
 from retrival.encoder import make_embedding_function
 
 
+# FIXME delete for production
 def make_fake_database(config: Config):
     data = {
         "mrn": [1, 2, 3, 4, 5],
         "asd": [1, 1, 0, 0, 1],
+        "age": [0.1, 0.5, 1.0, 2.0, 3.0],
         "text": [
             "The quick red fox jumps over the lazy dog.",
             "A quick brown fox leaped over the lazy dog.",
@@ -51,10 +53,13 @@ def main():
     )
     if config.populate_database:
         populate_database(collection=collection, config=config)
+    # you can filter on the metadata using the 'where' arg
+    # For example, where={"asd": 1, "age" {"$lte": 2.0}}
+    # will return only documents where asd is 1 and age is less than or equal to 2.0
     query_results = collection.query(
         query_texts=query_texts,
         n_results=config.vector_database.k_neighbors,
-        where=None,  # you can filter based on metadata e.g., {"asd": 1}
+        where=None,  # TODO add filtering
         include=[
             "documents",
             "distances",

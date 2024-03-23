@@ -26,12 +26,13 @@ class Encoder(EmbeddingFunction):
         return outputs.last_hidden_state.mean(dim=1).detach().tolist()
 
 
-# FIXME uncomment for production
 def make_embedding_function(config: Config):
+    # FIXME uncomment for production
     # tokenizer_path = config.encoder.huggingface / config.encoder.tokenizer
     # bcb_model_path = config.encoder.huggingface / config.encoder.bioclinicalbert
     # tokenizer = AutoTokenizer.from_pretrained(bcb_tokenizer_path)
     # model = AutoModel.from_pretrained(bcb_model_path)
+    # FIXME delete for production
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
     model = AutoModel.from_pretrained("bert-base-uncased")
     return Encoder(model=model, tokenizer=tokenizer)
