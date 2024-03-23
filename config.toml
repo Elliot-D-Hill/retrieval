@@ -1,0 +1,20 @@
+random_seed = 42
+populate_database = true
+
+[relational_database]
+filepath = "sqlite:///data/clinical_notes.sqlite" # Replace with .../.../clinical_notes.sqlite
+table_name = "clinical_notes"
+
+[vector_database]
+collection_name = "clinical_notes" 
+table_name = "clinical_notes"
+path = "data/vector_database"
+# filepath = ...
+chunk_length = 20
+overlap = 5
+k_neighbors = 2
+
+[encoder]
+huggingface = "projects/Pro00111224 - ML for EHR-based Autism and ADHD Surveillance/huggingface_models"
+bioclinical_bert = "BCB_model"
+tokenizer = "BCB_tokenizer"

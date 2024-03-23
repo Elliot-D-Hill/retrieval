@@ -1,0 +1,9 @@
+pydantic
+transformers
+sqlalchemy
+chromadb
+torch
+polars
+pandas
+toml
+numpy
