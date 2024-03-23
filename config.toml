@@ -10,8 +10,8 @@ collection_name = "clinical_notes"
 table_name = "clinical_notes"
 path = "data/vector_database"
 # filepath = ...
-chunk_length = 20
-overlap = 5
+chunk_length = 20 # FIXME 300
+overlap = 5 # FIXME 50
 k_neighbors = 2
 
 [encoder]
