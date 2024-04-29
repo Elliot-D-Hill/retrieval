@@ -6,17 +6,17 @@ from sqlalchemy import create_engine
 from transformers import logging
 import json
 
-from retrival.config import Config
-from retrival.database import populate_database
-from retrival.encoder import make_embedding_function
+from retrieval.config import Config
+from retrieval.database import populate_database
+from retrieval.encoder import make_embedding_function
 
 
 # FIXME delete for production
 def make_fake_database(config: Config):
     data = {
-        "mrn": [1, 2, 3, 4, 5],
-        "asd": [1, 1, 0, 0, 1],
-        "age": [0.1, 0.5, 1.0, 2.0, 3.0],
+        "mrn": [None, None, None, None, None],
+        "asd": [1, None, 0, 0, 1],
+        "age": [0.1, None, 1.0, 2.0, 3.0],
         "text": [
             "The quick red fox jumps over the lazy dog.",
             "A quick brown fox leaped over the lazy dog.",
@@ -39,11 +39,7 @@ def main():
     config = Config(**config_data)
     # TODO delete for production
     make_fake_database(config=config)
-    query_texts = [
-        "A fast black cat leaped over the sleepy wolf",
-        "An apple pie a week keeps the physician away",
-    ]
-    print(query_texts)
+    print(config.queries.query_texts)
     embedding_function = make_embedding_function(config=config)
     client = PersistentClient(path=config.vector_database.path)
     collection = client.get_or_create_collection(
@@ -57,7 +53,7 @@ def main():
     # For example, where={"asd": 1, "age" {"$lte": 2.0}}
     # will return only documents where asd is 1 and age is less than or equal to 2.0
     query_results = collection.query(
-        query_texts=query_texts,
+        query_texts=config.queries.query_texts,
         n_results=config.vector_database.k_neighbors,
         where=None,  # TODO add filtering
         include=[

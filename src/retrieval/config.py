@@ -1,5 +1,6 @@
 from pathlib import Path
 from pydantic import BaseModel
+from sympy import Q
 
 
 class Encoder(BaseModel):
@@ -22,9 +23,14 @@ class VectorDatabase(BaseModel):
     k_neighbors: int
 
 
+class Queries(BaseModel):
+    query_texts: list[str]
+
+
 class Config(BaseModel):
     random_seed: int
     populate_database: bool
+    queries: Queries
     encoder: Encoder
     relational_database: RelationalDatabase
     vector_database: VectorDatabase

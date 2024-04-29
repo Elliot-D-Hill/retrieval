@@ -5,7 +5,7 @@ from chromadb import (
 )
 from transformers import AutoTokenizer, AutoModel
 
-from retrival.config import Config
+from retrieval.config import Config
 
 
 class Encoder(EmbeddingFunction):

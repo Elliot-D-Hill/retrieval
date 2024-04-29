@@ -1,4 +1,4 @@
-from retrival.config import Config
+from retrieval.config import Config
 from sqlalchemy import create_engine, text
 from chromadb import Collection, Metadata
 
@@ -31,6 +31,7 @@ def populate_database(collection: Collection, config: Config) -> None:
             next_i = i + n_chunks
             ids = [str(id_i) for id_i in range(i, next_i)]
             i = next_i
+            row = {key: value for key, value in row.items() if value is not None}
             metadatas: list[Metadata] = [row] * n_chunks
             collection.upsert(
                 documents=chunks,

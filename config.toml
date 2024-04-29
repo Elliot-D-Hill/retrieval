@@ -6,15 +6,21 @@ filepath = "sqlite:///data/clinical_notes.sqlite" # Replace with .../.../clinica
 table_name = "clinical_notes"
 
 [vector_database]
-collection_name = "clinical_notes" 
+collection_name = "clinical_notes"
 table_name = "clinical_notes"
 path = "data/vector_database"
-# filepath = ...
-chunk_length = 20 # FIXME 300
-overlap = 5 # FIXME 50
+chunk_length = 20                  # FIXME 300
+overlap = 5                        # FIXME 50
 k_neighbors = 2
 
 [encoder]
 huggingface = "projects/Pro00111224 - ML for EHR-based Autism and ADHD Surveillance/huggingface_models"
 bioclinical_bert = "BCB_model"
 tokenizer = "BCB_tokenizer"
+
+
+[queries]
+query_texts = [
+    "A fast black cat leaped over the sleepy wolf",
+    "An apple pie a week keeps the physician away",
+]
