@@ -1,2 +1,2 @@
-# template
-A template for data science projects in python
+# Retrieval
+A small working example of a vector database
